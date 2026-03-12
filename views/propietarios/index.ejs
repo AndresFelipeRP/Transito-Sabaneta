@@ -1,0 +1,48 @@
+<%- include('../partials/navbar') %>
+
+<h1>👤 Propietarios</h1>
+<a href="/propietarios/crear" class="btn btn-primary">➕ Nuevo Propietario</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Identificación</th>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Tipo</th>
+            <th>Detalle</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% propietarios.forEach(p => { %>
+        <tr>
+            <td><%= p.identificacion %></td>
+            <td><%= p.nombre %></td>
+            <td><%= p.direccion %></td>
+            <td>
+                <% if (p.tipo === 'persona') { %>
+                    <span class="badge-persona">Persona</span>
+                <% } else { %>
+                    <span class="badge-empresa">Empresa</span>
+                <% } %>
+            </td>
+            <td>
+                <% if (p.tipo === 'persona') { %>
+                    <%= p.apellido %> | <%= p.tel_persona %>
+                <% } else { %>
+                    <%= p.representante_legal %> | <%= p.tel_empresa %>
+                <% } %>
+            </td>
+            <td>
+                <a href="/propietarios/editar/<%= p.id %>" class="btn btn-warning">✏️ Editar</a>
+                <form action="/propietarios/eliminar/<%= p.id %>" method="POST" style="display:inline">
+                    <button class="btn btn-danger" onclick="return confirm('¿Eliminar?')">🗑️ Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,46 @@
+<%- include('../partials/navbar') %>
+
+<h1>✏️ Editar Propietario</h1>
+<a href="/propietarios" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/propietarios/editar/<%= propietario.id %>" method="POST">
+        <input type="hidden" name="tipo" value="<%= propietario.tipo %>">
+        <div class="form-group">
+            <label>Identificación (no editable)</label>
+            <input type="text" value="<%= propietario.identificacion %>" disabled>
+        </div>
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" value="<%= propietario.nombre %>" required>
+        </div>
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" name="direccion" value="<%= propietario.direccion %>" required>
+        </div>
+
+        <% if (propietario.tipo === 'persona') { %>
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" name="apellido" value="<%= propietario.apellido %>">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="tel_persona" value="<%= propietario.tel_persona %>">
+            </div>
+        <% } else { %>
+            <div class="form-group">
+                <label>Representante Legal</label>
+                <input type="text" name="representante_legal" value="<%= propietario.representante_legal %>">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="tel_empresa" value="<%= propietario.tel_empresa %>">
+            </div>
+        <% } %>
+
+        <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,40 @@
+<%- include('../partials/navbar') %>
+
+<h1>📋 Matrículas</h1>
+<a href="/matriculas/crear" class="btn btn-primary">➕ Nueva Matrícula</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>N° Matrícula</th>
+            <th>Fecha</th>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Propietario</th>
+            <th>Identificación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% matriculas.forEach(m => { %>
+        <tr>
+            <td><strong><%= m.numero_matricula %></strong></td>
+            <td><%= new Date(m.fecha_matricula).toLocaleDateString('es-CO') %></td>
+            <td><%= m.placa %></td>
+            <td><%= m.marca %></td>
+            <td><%= m.modelo %></td>
+            <td><%= m.nombre_propietario %></td>
+            <td><%= m.identificacion %></td>
+            <td>
+                <a href="/matriculas/editar/<%= m.id %>" class="btn btn-warning">✏️ Editar</a>
+                <form action="/matriculas/eliminar/<%= m.id %>" method="POST" style="display:inline">
+                    <button class="btn btn-danger" onclick="return confirm('¿Eliminar?')">🗑️ Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<%- include('../partials/footer') %>

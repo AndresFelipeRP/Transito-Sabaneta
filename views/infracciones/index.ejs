@@ -1,0 +1,53 @@
+<%- include('../partials/navbar') %>
+
+<h1>🚨 Infracciones</h1>
+<a href="/infracciones/crear" class="btn btn-primary">➕ Nueva Infracción</a>
+<a href="/infracciones/fuente/crear" class="btn btn-secondary">🔧 Nueva Fuente</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Valor Multa</th>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Fuente</th>
+            <th>Detalle</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% infracciones.forEach(i => { %>
+        <tr>
+            <td><%= new Date(i.fecha_infraccion).toLocaleDateString('es-CO') %></td>
+            <td><%= i.descripcion %></td>
+            <td><strong>$ <%= Number(i.valor_multa).toLocaleString('es-CO') %></strong></td>
+            <td><%= i.placa %></td>
+            <td><%= i.marca %></td>
+            <td>
+                <% if (i.tipo_fuente === 'agente') { %>
+                    <span class="badge-agente">Agente</span>
+                <% } else { %>
+                    <span class="badge-camara">Cámara</span>
+                <% } %>
+            </td>
+            <td>
+                <% if (i.tipo_fuente === 'agente') { %>
+                    <%= i.nombre_agente %> (<%= i.badge %>)
+                <% } else { %>
+                    <%= i.codigo_camara %>
+                <% } %>
+            </td>
+            <td>
+                <a href="/infracciones/editar/<%= i.id %>" class="btn btn-warning">✏️ Editar</a>
+                <form action="/infracciones/eliminar/<%= i.id %>" method="POST" style="display:inline">
+                    <button class="btn btn-danger" onclick="return confirm('¿Eliminar?')">🗑️ Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<%- include('../partials/footer') %>

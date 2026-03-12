@@ -1,0 +1,59 @@
+<%- include('../partials/navbar') %>
+
+<h1>🔧 Nueva Fuente de Detección</h1>
+<a href="/infracciones" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/infracciones/fuente/crear" method="POST">
+        <div class="form-group">
+            <label>Ubicación</label>
+            <input type="text" name="ubicacion" required>
+        </div>
+        <div class="form-group">
+            <label>Tipo</label>
+            <select name="tipo" id="tipo" onchange="toggleTipo()" required>
+                <option value="">-- Seleccione --</option>
+                <option value="agente">Agente de Tránsito</option>
+                <option value="camara">Cámara de Detección</option>
+            </select>
+        </div>
+
+        <div id="campos-agente" style="display:none">
+            <div class="form-group">
+                <label>Nombre del Agente</label>
+                <input type="text" name="nombre">
+            </div>
+            <div class="form-group">
+                <label>Badge</label>
+                <input type="text" name="badge">
+            </div>
+            <div class="form-group">
+                <label>Turno</label>
+                <input type="text" name="turno">
+            </div>
+        </div>
+
+        <div id="campos-camara" style="display:none">
+            <div class="form-group">
+                <label>Código de Cámara</label>
+                <input type="text" name="codigo_camara">
+            </div>
+            <div class="form-group">
+                <label>Coordenadas</label>
+                <input type="text" name="coordenadas">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Guardar</button>
+    </form>
+</div>
+
+<script>
+    function toggleTipo() {
+        const tipo = document.getElementById('tipo').value;
+        document.getElementById('campos-agente').style.display = tipo === 'agente' ? 'block' : 'none';
+        document.getElementById('campos-camara').style.display = tipo === 'camara' ? 'block' : 'none';
+    }
+</script>
+
+<%- include('../partials/footer') %>

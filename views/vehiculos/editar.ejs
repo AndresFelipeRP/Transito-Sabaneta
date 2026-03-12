@@ -1,0 +1,59 @@
+<%- include('../partials/navbar') %>
+
+<h1>✏️ Editar Vehículo</h1>
+<a href="/vehiculos" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/vehiculos/editar/<%= vehiculo.id %>" method="POST">
+        <input type="hidden" name="tipo" value="<%= vehiculo.tipo %>">
+        <div class="form-group">
+            <label>Placa (no editable)</label>
+            <input type="text" value="<%= vehiculo.placa %>" disabled>
+        </div>
+        <div class="form-group">
+            <label>Marca</label>
+            <input type="text" name="marca" value="<%= vehiculo.marca %>" required>
+        </div>
+        <div class="form-group">
+            <label>Modelo</label>
+            <input type="text" name="modelo" value="<%= vehiculo.modelo %>" required>
+        </div>
+        <div class="form-group">
+            <label>Tipo (no editable)</label>
+            <input type="text" value="<%= vehiculo.tipo %>" disabled>
+        </div>
+
+        <% if (vehiculo.tipo === 'automovil') { %>
+            <div class="form-group">
+                <label>Número de puertas</label>
+                <input type="number" name="numero_puertas" value="<%= vehiculo.numero_puertas %>">
+            </div>
+            <div class="form-group">
+                <label>Tipo de combustible</label>
+                <input type="text" name="tipo_combustible" value="<%= vehiculo.tipo_combustible %>">
+            </div>
+        <% } else if (vehiculo.tipo === 'moto') { %>
+            <div class="form-group">
+                <label>Tipo de moto</label>
+                <input type="text" name="tipo_moto" value="<%= vehiculo.tipo_moto %>">
+            </div>
+            <div class="form-group">
+                <label>Cilindrada</label>
+                <input type="number" name="cilindrada" value="<%= vehiculo.cilindrada %>">
+            </div>
+        <% } else { %>
+            <div class="form-group">
+                <label>Capacidad de carga (ton)</label>
+                <input type="number" step="0.1" name="capacidad_carga" value="<%= vehiculo.capacidad_carga %>">
+            </div>
+            <div class="form-group">
+                <label>Tipo de carrocería</label>
+                <input type="text" name="tipo_carroceria" value="<%= vehiculo.tipo_carroceria %>">
+            </div>
+        <% } %>
+
+        <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

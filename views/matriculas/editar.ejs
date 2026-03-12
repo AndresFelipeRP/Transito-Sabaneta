@@ -1,0 +1,34 @@
+<%- include('../partials/navbar') %>
+
+<h1>✏️ Editar Matrícula</h1>
+<a href="/matriculas" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/matriculas/editar/<%= matricula.id %>" method="POST">
+        <div class="form-group">
+            <label>N° Matrícula (no editable)</label>
+            <input type="text" value="<%= matricula.numero_matricula %>" disabled>
+        </div>
+        <div class="form-group">
+            <label>Vehículo (no editable)</label>
+            <input type="text" value="<%= matricula.placa %> - <%= matricula.marca %> <%= matricula.modelo %>" disabled>
+        </div>
+        <div class="form-group">
+            <label>Fecha de Matrícula</label>
+            <input type="date" name="fecha_matricula" value="<%= matricula.fecha_matricula.toISOString().split('T')[0] %>" required>
+        </div>
+        <div class="form-group">
+            <label>Propietario</label>
+            <select name="propietario_id" required>
+                <% propietarios.forEach(p => { %>
+                    <option value="<%= p.id %>" <%= p.id === matricula.propietario_id ? 'selected' : '' %>>
+                        <%= p.identificacion %> - <%= p.nombre %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

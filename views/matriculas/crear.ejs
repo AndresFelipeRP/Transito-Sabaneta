@@ -1,0 +1,38 @@
+<%- include('../partials/navbar') %>
+
+<h1>➕ Nueva Matrícula</h1>
+<a href="/matriculas" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/matriculas/crear" method="POST">
+        <div class="form-group">
+            <label>Número de Matrícula</label>
+            <input type="text" name="numero_matricula" required>
+        </div>
+        <div class="form-group">
+            <label>Fecha de Matrícula</label>
+            <input type="date" name="fecha_matricula" required>
+        </div>
+        <div class="form-group">
+            <label>Vehículo</label>
+            <select name="vehiculo_id" required>
+                <option value="">-- Seleccione un vehículo --</option>
+                <% vehiculos.forEach(v => { %>
+                    <option value="<%= v.id %>"><%= v.placa %> - <%= v.marca %> <%= v.modelo %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Propietario</label>
+            <select name="propietario_id" required>
+                <option value="">-- Seleccione un propietario --</option>
+                <% propietarios.forEach(p => { %>
+                    <option value="<%= p.id %>"><%= p.identificacion %> - <%= p.nombre %></option>
+                <% }) %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Guardar</button>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

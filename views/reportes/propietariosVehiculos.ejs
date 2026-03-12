@@ -1,0 +1,117 @@
+<%- include('../partials/navbar') %>
+
+<h1>👤 Registro General de Propietarios</h1>
+
+<div style="margin-bottom:20px; display:flex; gap:10px;">
+    <a href="/reportes/propietarios-vehiculos/pdf" class="btn btn-danger">📄 Exportar PDF</a>
+    <a href="/reportes" class="btn btn-secondary">← Volver</a>
+</div>
+
+<%
+    const agrupado = {};
+    datos.forEach(row => {
+        const key = row.identificacion;
+        if (!agrupado[key]) {
+            agrupado[key] = {
+                identificacion: row.identificacion,
+                nombre: row.nombre,
+                tipo: row.tipo_propietario,
+                direccion: row.direccion,
+                apellido: row.apellido,
+                tel_persona: row.tel_persona,
+                representante_legal: row.representante_legal,
+                tel_empresa: row.tel_empresa,
+                vehiculos: []
+            };
+        }
+        if (row.placa) agrupado[key].vehiculos.push(row);
+    });
+    const propietarios = Object.values(agrupado);
+%>
+
+<!-- Resumen general -->
+<div style="background:white; border-radius:10px; padding:20px;
+    margin-bottom:24px; box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    display:flex; gap:40px; flex-wrap:wrap;">
+    <div>
+        <div style="font-size:28px; font-weight:bold; color:#1a237e;">
+            <%= propietarios.length %>
+        </div>
+        <div style="color:#666; font-size:13px;">Total Propietarios</div>
+    </div>
+    <div>
+        <div style="font-size:28px; font-weight:bold; color:#2e7d32;">
+            <%= propietarios.filter(p => p.tipo === 'persona').length %>
+        </div>
+        <div style="color:#666; font-size:13px;">Personas</div>
+    </div>
+    <div>
+        <div style="font-size:28px; font-weight:bold; color:#6a1b9a;">
+            <%= propietarios.filter(p => p.tipo === 'empresa').length %>
+        </div>
+        <div style="color:#666; font-size:13px;">Empresas</div>
+    </div>
+    <div>
+        <div style="font-size:28px; font-weight:bold; color:#e65100;">
+            <%= datos.filter(d => d.placa).length %>
+        </div>
+        <div style="color:#666; font-size:13px;">Total Vehículos</div>
+    </div>
+</div>
+
+<% propietarios.forEach(prop => { %>
+<div style="background:white; border-radius:10px; padding:20px;
+    margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    border-left: 5px solid #1a237e;">
+
+    <h3 style="color:#1a237e; margin-bottom:8px;">
+        👤 <%= prop.nombre %>
+        <span class="badge-<%= prop.tipo %>" style="font-size:12px; font-weight:normal;">
+            <%= prop.tipo %>
+        </span>
+    </h3>
+
+    <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:13px;
+        color:#555; margin-bottom:15px; background:#f5f5f5;
+        padding:10px; border-radius:6px;">
+        <span><strong>ID:</strong> <%= prop.identificacion %></span>
+        <span><strong>Dirección:</strong> <%= prop.direccion %></span>
+        <% if (prop.tipo === 'persona') { %>
+            <span><strong>Apellido:</strong> <%= prop.apellido || 'N/A' %></span>
+            <span><strong>Teléfono:</strong> <%= prop.tel_persona || 'N/A' %></span>
+        <% } else { %>
+            <span><strong>Rep. Legal:</strong> <%= prop.representante_legal || 'N/A' %></span>
+            <span><strong>Teléfono:</strong> <%= prop.tel_empresa || 'N/A' %></span>
+        <% } %>
+    </div>
+
+    <% if (prop.vehiculos.length === 0) { %>
+        <p style="color:#999; font-size:13px;">Sin vehículos registrados</p>
+    <% } else { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Marca / Modelo</th>
+                    <th>Tipo Vehículo</th>
+                    <th>N° Matrícula</th>
+                    <th>Fecha Matrícula</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% prop.vehiculos.forEach(v => { %>
+                <tr>
+                    <td><strong><%= v.placa %></strong></td>
+                    <td><%= v.marca %> <%= v.modelo %></td>
+                    <td><%= v.tipo_vehiculo %></td>
+                    <td><%= v.numero_matricula || 'N/A' %></td>
+                    <td><%= v.fecha_matricula ? new Date(v.fecha_matricula).toLocaleDateString('es-CO') : 'N/A' %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
+<% }) %>
+
+<%- include('../partials/footer') %>

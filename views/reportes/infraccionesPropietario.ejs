@@ -1,0 +1,100 @@
+<%- include('../partials/navbar') %>
+
+<h1>🚨 Infracciones por Propietario</h1>
+
+<div style="margin-bottom:20px; display:flex; gap:10px;">
+    <a href="/reportes/infracciones-propietario/pdf" class="btn btn-danger">
+        📄 Exportar PDF
+    </a>
+    <a href="/reportes" class="btn btn-secondary">← Volver</a>
+</div>
+
+<%
+    // Agrupar por propietario
+    const agrupado = {};
+    datos.forEach(row => {
+        const key = row.identificacion;
+        if (!agrupado[key]) {
+            agrupado[key] = {
+                identificacion: row.identificacion,
+                nombre: row.nombre,
+                tipo: row.tipo_propietario,
+                direccion: row.direccion,
+                vehiculos: []
+            };
+        }
+        if (row.placa) agrupado[key].vehiculos.push(row);
+    });
+    const propietarios = Object.values(agrupado);
+%>
+
+<% propietarios.forEach(prop => { %>
+<div style="background:white; border-radius:10px; padding:20px; 
+    margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    border-left: 5px solid #1a237e;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h3 style="color:#1a237e; margin-bottom:4px;">
+                👤 <%= prop.nombre %>
+            </h3>
+            <small style="color:#666;">
+                <%= prop.identificacion %> | 
+                <span class="badge-<%= prop.tipo %>"><%= prop.tipo %></span> | 
+                <%= prop.direccion %>
+            </small>
+        </div>
+    </div>
+
+    <% if (prop.vehiculos.length === 0) { %>
+        <p style="color:#999; margin-top:12px;">Sin vehículos registrados</p>
+    <% } else { %>
+        <table style="margin-top:15px;">
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Vehículo</th>
+                    <th>Tipo</th>
+                    <th>N° Infracciones</th>
+                    <th>Total Multas</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% prop.vehiculos.forEach(v => { %>
+                <tr>
+                    <td><strong><%= v.placa %></strong></td>
+                    <td><%= v.marca %> <%= v.modelo %></td>
+                    <td><%= v.tipo_vehiculo %></td>
+                    <td style="text-align:center;">
+                        <% if (v.total_infracciones > 0) { %>
+                            <span style="background:#ffebee; color:#c62828; 
+                                padding:3px 10px; border-radius:20px; font-weight:bold;">
+                                <%= v.total_infracciones %>
+                            </span>
+                        <% } else { %>
+                            <span style="background:#e8f5e9; color:#2e7d32; 
+                                padding:3px 10px; border-radius:20px;">0</span>
+                        <% } %>
+                    </td>
+                    <td style="color:#c62828; font-weight:bold;">
+                        $ <%= Number(v.total_multas).toLocaleString('es-CO') %>
+                    </td>
+                    <td style="font-size:12px; color:#555;">
+                        <% if (v.detalle_infracciones) { %>
+                            <% v.detalle_infracciones.split(' | ').forEach(d => { %>
+                                <div>• <%= d %></div>
+                            <% }) %>
+                        <% } else { %>
+                            Sin infracciones
+                        <% } %>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
+<% }) %>
+
+<%- include('../partials/footer') %>

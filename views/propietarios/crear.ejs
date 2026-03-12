@@ -1,0 +1,63 @@
+<%- include('../partials/navbar') %>
+
+<h1>➕ Nuevo Propietario</h1>
+<a href="/propietarios" class="btn btn-secondary">← Volver</a>
+
+<div class="form-card">
+    <form action="/propietarios/crear" method="POST">
+        <div class="form-group">
+            <label>Identificación</label>
+            <input type="text" name="identificacion" required>
+        </div>
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" required>
+        </div>
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" name="direccion" required>
+        </div>
+        <div class="form-group">
+            <label>Tipo</label>
+            <select name="tipo" id="tipo" onchange="toggleTipo()" required>
+                <option value="">-- Seleccione --</option>
+                <option value="persona">Persona</option>
+                <option value="empresa">Empresa</option>
+            </select>
+        </div>
+
+        <div id="campos-persona" style="display:none">
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" name="apellido">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="tel_persona">
+            </div>
+        </div>
+
+        <div id="campos-empresa" style="display:none">
+            <div class="form-group">
+                <label>Representante Legal</label>
+                <input type="text" name="representante_legal">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="tel_empresa">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Guardar</button>
+    </form>
+</div>
+
+<script>
+    function toggleTipo() {
+        const tipo = document.getElementById('tipo').value;
+        document.getElementById('campos-persona').style.display = tipo === 'persona' ? 'block' : 'none';
+        document.getElementById('campos-empresa').style.display = tipo === 'empresa' ? 'block' : 'none';
+    }
+</script>
+
+<%- include('../partials/footer') %>

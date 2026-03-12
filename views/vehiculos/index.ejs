@@ -1,0 +1,55 @@
+<%- include('../partials/navbar') %>
+
+<h1>🚗 Vehículos</h1>
+<a href="/vehiculos/crear" class="btn btn-primary">➕ Nuevo Vehículo</a>
+
+<!-- Buscador -->
+<form action="/vehiculos/buscar" method="GET" style="margin-bottom:20px; display:flex; gap:10px;">
+    <input type="text" name="placa" placeholder="🔍 Buscar por placa..." 
+        value="<%= typeof busqueda !== 'undefined' ? busqueda : '' %>"
+        style="padding:9px 12px; border:1px solid #ccc; border-radius:6px; font-size:14px; width:250px;">
+    <button type="submit" class="btn btn-primary" style="margin:0">Buscar</button>
+    <a href="/vehiculos" class="btn btn-secondary" style="margin:0">Ver todos</a>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Tipo</th>
+            <th>Propietario</th>
+            <th>Matrícula</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (vehiculos.length === 0) { %>
+            <tr>
+                <td colspan="7" style="text-align:center; padding:20px; color:#999;">
+                    No se encontraron vehículos
+                </td>
+            </tr>
+        <% } %>
+        <% vehiculos.forEach(v => { %>
+        <tr>
+            <td><strong><%= v.placa %></strong></td>
+            <td><%= v.marca %></td>
+            <td><%= v.modelo %></td>
+            <td><%= v.tipo %></td>
+            <td><%= v.nombre_propietario || 'Sin matrícula' %></td>
+            <td><%= v.numero_matricula || 'Sin matrícula' %></td>
+            <td>
+                <a href="/vehiculos/editar/<%= v.id %>" class="btn btn-warning">✏️ Editar</a>
+                <a href="/vehiculos/<%= v.id %>/infracciones" class="btn btn-secondary">🚨 Ver Infracciones</a>
+                <form action="/vehiculos/eliminar/<%= v.id %>" method="POST" style="display:inline">
+                    <button class="btn btn-danger" onclick="return confirm('¿Eliminar?')">🗑️ Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+<%- include('../partials/footer') %>

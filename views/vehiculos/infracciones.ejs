@@ -1,0 +1,65 @@
+<%- include('../partials/navbar') %>
+
+<h1>🚨 Infracciones del vehículo: <%= vehiculo.placa %></h1>
+<a href="/vehiculos" class="btn btn-secondary">← Volver</a>
+<a href="/infracciones/crear" class="btn btn-primary">➕ Nueva Infracción</a>
+
+<!-- Resumen del vehículo -->
+<div style="background:white; padding:20px; border-radius:10px; 
+    box-shadow:0 2px 10px rgba(0,0,0,0.08); margin-bottom:24px; 
+    display:flex; gap:30px; flex-wrap:wrap;">
+    <div><strong>Placa:</strong> <%= vehiculo.placa %></div>
+    <div><strong>Marca:</strong> <%= vehiculo.marca %></div>
+    <div><strong>Modelo:</strong> <%= vehiculo.modelo %></div>
+    <div><strong>Tipo:</strong> <%= vehiculo.tipo %></div>
+    <div><strong>Total infracciones:</strong> <%= infracciones.length %></div>
+    <div><strong>Total multas:</strong> 
+        <span style="color:#c62828; font-weight:bold;">
+            $ <%= Number(total).toLocaleString('es-CO') %>
+        </span>
+    </div>
+</div>
+
+<% if (infracciones.length === 0) { %>
+    <div style="background:white; padding:30px; border-radius:10px; 
+        text-align:center; color:#999; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+        ✅ Este vehículo no tiene infracciones registradas
+    </div>
+<% } else { %>
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Valor Multa</th>
+            <th>Fuente</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% infracciones.forEach(i => { %>
+        <tr>
+            <td><%= new Date(i.fecha_infraccion).toLocaleDateString('es-CO') %></td>
+            <td><%= i.descripcion %></td>
+            <td><strong>$ <%= Number(i.valor_multa).toLocaleString('es-CO') %></strong></td>
+            <td>
+                <% if (i.tipo_fuente === 'agente') { %>
+                    <span class="badge-agente">Agente</span>
+                <% } else { %>
+                    <span class="badge-camara">Cámara</span>
+                <% } %>
+            </td>
+            <td>
+                <% if (i.tipo_fuente === 'agente') { %>
+                    <%= i.nombre_agente %> (<%= i.badge %>)
+                <% } else { %>
+                    <%= i.codigo_camara %>
+                <% } %>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% } %>
+
+<%- include('../partials/footer') %>

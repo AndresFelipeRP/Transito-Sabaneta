@@ -1,0 +1,43 @@
+<%- include('../partials/navbar') %>
+
+<h1>➕ Nueva Infracción</h1>
+<a href="/infracciones" class="btn btn-secondary">← Volver</a>
+<a href="/infracciones/fuente/crear" class="btn btn-secondary">🔧 Nueva Fuente</a>
+
+<div class="form-card">
+    <form action="/infracciones/crear" method="POST">
+        <div class="form-group">
+            <label>Fecha de Infracción</label>
+            <input type="date" name="fecha_infraccion" required>
+        </div>
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="descripcion" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Valor de la Multa ($)</label>
+            <input type="number" name="valor_multa" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label>Vehículo</label>
+            <select name="vehiculo_id" required>
+                <option value="">-- Seleccione --</option>
+                <% vehiculos.forEach(v => { %>
+                    <option value="<%= v.id %>"><%= v.placa %> - <%= v.marca %> <%= v.modelo %></option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Fuente de Detección</label>
+            <select name="fuente_id" required>
+                <option value="">-- Seleccione --</option>
+                <% fuentes.forEach(f => { %>
+                    <option value="<%= f.id %>"><%= f.tipo.toUpperCase() %> - <%= f.ubicacion %></option>
+                <% }) %>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Guardar</button>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>
