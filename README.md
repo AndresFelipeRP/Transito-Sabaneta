@@ -244,7 +244,7 @@ Una vez iniciado el servidor:
 
 ## 👤 Autor
 
-**Andrés Felipe Ríos**
+**Andrés Felipe Ríos y Julián Agudelo Sepulveda**
 Estudiante de Ingeniería — Curso de Aprendizaje Automático e IA
 Medellín, Colombia 🇨🇴
 
