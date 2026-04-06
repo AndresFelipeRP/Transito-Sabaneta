@@ -14,6 +14,61 @@ const promisify = (fn, ...args) => {
     });
 };
 
+// Helper para paginación Relay-style
+const encodeCursor = (index) => Buffer.from(`cursor:${index}`).toString('base64');
+const decodeCursor = (cursor) => {
+    try {
+        const decoded = Buffer.from(cursor, 'base64').toString();
+        const parts = decoded.split(':');
+        if (parts[0] === 'cursor') {
+            const index = parseInt(parts[1]);
+            return isNaN(index) ? 0 : index;
+        }
+        return 0;
+    } catch (e) {
+        return 0; // Default to start if invalid cursor
+    }
+};
+
+const applyPagination = (items, { first, after, last, before }) => {
+    let startIndex = 0;
+    let endIndex = items.length;
+
+    if (after) {
+        startIndex = decodeCursor(after) + 1;
+    }
+    if (before) {
+        endIndex = decodeCursor(before);
+    }
+
+    // Ensure indices are within bounds
+    startIndex = Math.max(0, Math.min(startIndex, items.length));
+    endIndex = Math.max(0, Math.min(endIndex, items.length));
+
+    let slicedItems = items.slice(startIndex, endIndex);
+
+    if (first && first > 0) {
+        slicedItems = slicedItems.slice(0, first);
+    }
+    if (last && last > 0) {
+        slicedItems = slicedItems.slice(-last);
+    }
+
+    const edges = slicedItems.map((item, index) => ({
+        node: item,
+        cursor: encodeCursor(startIndex + index)
+    }));
+
+    const pageInfo = {
+        hasNextPage: (startIndex + slicedItems.length) < items.length,
+        hasPreviousPage: startIndex > 0,
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null
+    };
+
+    return { edges, pageInfo };
+};
+
 // Resolvers
 const resolvers = {
     // ==================== TYPE RESOLVERS (Interfaces) ====================
@@ -84,6 +139,19 @@ const resolvers = {
             const fuentes = await promisify(Infraccion.obtenerFuentes);
             return fuentes.find(f => f.id === parent.fuente_id);
         },
+        propietario: async (parent) => {
+            try {
+                const vehiculo = await promisify(Vehiculo.obtenerPorId, parent.vehiculo_id);
+                if (!vehiculo) return null;
+                const matriculas = await promisify(Matricula.obtenerTodas);
+                const matricula = matriculas.find(m => m.vehiculo_id === parent.vehiculo_id);
+                if (!matricula) return null;
+                return await promisify(Propietario.obtenerPorId, matricula.propietario_id);
+            } catch (e) {
+                console.error('Error resolviendo propietario:', e);
+                return null;
+            }
+        },
         vehiculoId: (parent) => parent.vehiculo_id,
         fuenteId: (parent) => parent.fuente_id,
         valorMulta: (parent) => parent.valor_multa
@@ -100,8 +168,14 @@ const resolvers = {
     // ==================== QUERIES ====================
     Query: {
         // Propietarios
-        propietarios: async () => {
-            return promisify(Propietario.obtenerTodos);
+        propietarios: async (_, { pagination, filtro }) => {
+            let propietarios = await promisify(Propietario.obtenerTodos);
+            if (filtro) {
+                if (filtro.tipo) propietarios = propietarios.filter(p => p && p.tipo === filtro.tipo);
+                if (filtro.nombre) propietarios = propietarios.filter(p => p && p.nombre && p.nombre.toLowerCase().includes(filtro.nombre.toLowerCase()));
+                if (filtro.identificacion) propietarios = propietarios.filter(p => p && p.identificacion === filtro.identificacion);
+            }
+            return applyPagination(propietarios, pagination || {});
         },
 
         propietario: async (_, { id }) => {
@@ -109,8 +183,14 @@ const resolvers = {
         },
 
         // Vehículos
-        vehiculos: async () => {
-            return promisify(Vehiculo.obtenerTodos);
+        vehiculos: async (_, { pagination, filtro }) => {
+            let vehiculos = await promisify(Vehiculo.obtenerTodos);
+            if (filtro) {
+                if (filtro.tipo) vehiculos = vehiculos.filter(v => v && v.tipo === filtro.tipo);
+                if (filtro.marca) vehiculos = vehiculos.filter(v => v && v.marca && v.marca.toLowerCase().includes(filtro.marca.toLowerCase()));
+                if (filtro.placa) vehiculos = vehiculos.filter(v => v && v.placa && v.placa.toLowerCase().includes(filtro.placa.toLowerCase()));
+            }
+            return applyPagination(vehiculos, pagination || {});
         },
 
         vehiculo: async (_, { id }) => {
@@ -131,8 +211,32 @@ const resolvers = {
         },
 
         // Infracciones
-        infracciones: async () => {
-            return promisify(Infraccion.obtenerTodas);
+        infracciones: async (_, { pagination, filtro }) => {
+            let infracciones = await promisify(Infraccion.obtenerTodas);
+            if (filtro) {
+                if (filtro.fechaDesde) {
+                    const fechaDesde = new Date(filtro.fechaDesde);
+                    if (!isNaN(fechaDesde.getTime())) {
+                        infracciones = infracciones.filter(i => i && i.fecha_infraccion && new Date(i.fecha_infraccion) >= fechaDesde);
+                    }
+                }
+                if (filtro.fechaHasta) {
+                    const fechaHasta = new Date(filtro.fechaHasta);
+                    if (!isNaN(fechaHasta.getTime())) {
+                        infracciones = infracciones.filter(i => i && i.fecha_infraccion && new Date(i.fecha_infraccion) <= fechaHasta);
+                    }
+                }
+                if (filtro.valorMultaMin !== undefined && filtro.valorMultaMin !== null) {
+                    infracciones = infracciones.filter(i => i && i.valor_multa >= filtro.valorMultaMin);
+                }
+                if (filtro.valorMultaMax !== undefined && filtro.valorMultaMax !== null) {
+                    infracciones = infracciones.filter(i => i && i.valor_multa <= filtro.valorMultaMax);
+                }
+                if (filtro.vehiculoId) {
+                    infracciones = infracciones.filter(i => i && i.vehiculo_id == filtro.vehiculoId);
+                }
+            }
+            return applyPagination(infracciones, pagination || {});
         },
 
         infraccion: async (_, { id }) => {

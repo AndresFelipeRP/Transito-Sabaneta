@@ -95,6 +95,7 @@ const typeDefs = gql`
         fuenteId: Int!
         vehiculo: Vehiculo!
         fuente: FuenteDeteccionInterface!
+        propietario: PropietarioInterface!
     }
 
     type AgenteTransito implements FuenteDeteccionInterface {
@@ -139,6 +140,44 @@ const typeDefs = gql`
     type InfraccionPorMes {
         mes: Int!
         total: Int!
+    }
+
+    # ==================== PAGINATION TYPES ====================
+    type PageInfo {
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
+        startCursor: String
+        endCursor: String
+    }
+
+    type PropietarioEdge {
+        node: PropietarioInterface!
+        cursor: String!
+    }
+
+    type PropietarioConnection {
+        edges: [PropietarioEdge!]!
+        pageInfo: PageInfo!
+    }
+
+    type VehiculoEdge {
+        node: Vehiculo!
+        cursor: String!
+    }
+
+    type VehiculoConnection {
+        edges: [VehiculoEdge!]!
+        pageInfo: PageInfo!
+    }
+
+    type InfraccionEdge {
+        node: Infraccion!
+        cursor: String!
+    }
+
+    type InfraccionConnection {
+        edges: [InfraccionEdge!]!
+        pageInfo: PageInfo!
     }
 
     # ==================== INPUTS ====================
@@ -198,14 +237,43 @@ const typeDefs = gql`
         coordenadas: String
     }
 
+    # ==================== FILTROS PARA PAGINACIÓN ====================
+    input FiltroPropietarioInput {
+        tipo: TipoPropietario
+        nombre: String
+        identificacion: String
+    }
+
+    input FiltroVehiculoInput {
+        tipo: TipoVehiculo
+        marca: String
+        placa: String
+    }
+
+    input FiltroInfraccionInput {
+        fechaDesde: String
+        fechaHasta: String
+        valorMultaMin: Float
+        valorMultaMax: Float
+        vehiculoId: ID
+    }
+
+    # ==================== PAGINATION INPUTS ====================
+    input PaginationInput {
+        first: Int
+        after: String
+        last: Int
+        before: String
+    }
+
     # ==================== QUERIES ====================
     type Query {
         # Propietarios
-        propietarios: [PropietarioInterface!]!
+        propietarios(pagination: PaginationInput, filtro: FiltroPropietarioInput): PropietarioConnection!
         propietario(id: ID!): PropietarioInterface
 
         # Vehículos
-        vehiculos: [Vehiculo!]!
+        vehiculos(pagination: PaginationInput, filtro: FiltroVehiculoInput): VehiculoConnection!
         vehiculo(id: ID!): Vehiculo
         buscarVehiculoPorPlaca(placa: String!): [Vehiculo!]!
 
@@ -214,7 +282,7 @@ const typeDefs = gql`
         matricula(id: ID!): Matricula
 
         # Infracciones
-        infracciones: [Infraccion!]!
+        infracciones(pagination: PaginationInput, filtro: FiltroInfraccionInput): InfraccionConnection!
         infraccion(id: ID!): Infraccion
 
         # Fuentes de detección

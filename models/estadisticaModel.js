@@ -9,7 +9,16 @@ const Estadistica = {
                 (SELECT COUNT(*) FROM infraccion) AS total_infracciones,
                 (SELECT COALESCE(SUM(valor_multa), 0) FROM infraccion) AS total_multas
         `;
-        db.query(sql, (err, rows) => callback(err, rows[0]));
+        db.query(sql, (err, rows) => {
+            if (err) return callback(err);
+            const resumen = Array.isArray(rows) && rows.length > 0 ? rows[0] : {
+                total_propietarios: 0,
+                total_vehiculos: 0,
+                total_infracciones: 0,
+                total_multas: 0
+            };
+            callback(null, resumen);
+        });
     },
 
     vehiculosPorTipo: (callback) => {
